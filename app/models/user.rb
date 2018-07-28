@@ -27,7 +27,6 @@ class User < ApplicationRecord
     key_len = @@len
     digest = OpenSSL::Digest::SHA512.new
     hash = OpenSSL::PKCS5.pbkdf2_hmac(password, salt, iter, key_len, digest)
-    puts hash
 
     return bin_to_hex(hash)
   end

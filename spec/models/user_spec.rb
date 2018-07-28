@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe User, type: :model do
 
   before(:all) do
-    @user1 = create(:user)
+    @user1 = create(:user, email: 'johndoe@test.com')
+    puts @user1.inspect
   end
 
   it 'has a valid factory' do
@@ -15,7 +16,8 @@ RSpec.describe User, type: :model do
   end
 
   it "has a unique email" do
-    user2 = build(:user, email: "johndoe@test.com")
+
+    user2 = build(:user, email: 'johndoe@test.com')
     expect(user2).to_not be_valid
   end
 

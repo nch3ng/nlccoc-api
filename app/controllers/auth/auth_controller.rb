@@ -7,6 +7,11 @@ class Auth::AuthController < ApplicationController
       return
     end
 
+    if !EmailValidator.valid?(email)
+      render :json => { 'success': false, 'msg': 'Bad email format' }
+      return
+    end
+
     @user = User.find_by(email: email)
     if !@user.nil?
       # Email has been registered
@@ -29,6 +34,11 @@ class Auth::AuthController < ApplicationController
     pass = params['password']
     if pass.nil? 
       render :json => { 'success': false, 'msg': 'Password is needed' }
+      return
+    end
+
+    if pass.length < 8 
+      render :json => { 'success': false, 'msg': 'Password has to be at least 8 characters long' }
       return
     end
 
@@ -64,18 +74,18 @@ class Auth::AuthController < ApplicationController
     @user = User.find_by(email: email)
 
     if @user.nil?
-      render :json => { 'success': false, 'msg': 'This email is not registered.' }
+      render :json => { 'success': false, 'msg': 'This email is not registered' }
       return
     end
 
     if !@user.validatePassword(password)
-      render :json => { 'success': false, 'msg': 'Password is wrong.' }
+      render :json => { 'success': false, 'msg': 'The password is wrong' }
       return
     end
     exp = Time.now.to_i + 4 * 3600
     token = @user.generateToken(exp)
 
-    render :json => { 'success': true, 'msg': 'Successfully logged in.', token: token }
+    render :json => { 'success': true, 'msg': 'You are successfully logged in', token: token }
 
   end
 

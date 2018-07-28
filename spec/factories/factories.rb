@@ -9,9 +9,9 @@ FactoryBot.define do
   end
 
   factory :user do
+    sequence(:email) {|n| "johndoe#{n}@test.com" }
     first_name "John"
     last_name "Doe"
-    email "johndoe@test.com"
     role
     org
   end
