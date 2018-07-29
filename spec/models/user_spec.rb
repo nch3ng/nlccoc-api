@@ -4,7 +4,6 @@ RSpec.describe User, type: :model do
 
   before(:all) do
     @user1 = create(:user, email: 'johndoe@test.com')
-    puts @user1.inspect
   end
 
   it 'has a valid factory' do

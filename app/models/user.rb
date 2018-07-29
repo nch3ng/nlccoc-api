@@ -40,6 +40,18 @@ class User < ApplicationRecord
     return token
   end
 
+  def self.validateToken(token)
+    secret = '64a839ead9ea591e1ec8fdfb714fae87b3172832ba79fac2fd4beae5c7e3ca4a95e23a7cd5918d'
+    begin
+      decoded_token = JWT.decode token, secret, 'HS256'
+      return { success: true, decoded_token: decoded_token}
+    rescue JWT::ExpiredSignature
+      return { success: false, msg: 'Token has been expired' }
+    rescue JWT::DecodeError
+      return { success: false, msg: 'Not enough or too many segments' }
+    end
+  end
+
   private def bin_to_hex(s)
     s.each_byte.map { |b| b.to_s(16) }.join
   end

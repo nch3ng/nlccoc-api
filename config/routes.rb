@@ -4,8 +4,11 @@ Rails.application.routes.draw do
     namespace :auth do
       post 'register', to: 'auth#register'
       post 'login', to: 'auth#login'
+      get 'check-state', to: 'auth#check_state'
       get 'forgetpassword', to: 'auth#forgetpassword'
       post 'restpassword', to: 'auth#resetpassword'
     end
+
+    resources :users
   end
 end
