@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   belongs_to :role
+  belongs_to :org_role, class_name: 'Role'
   belongs_to :org, class_name: 'Organization'
   validates :first_name, :last_name, presence: true
   validates :email, uniqueness: true, presence: true
@@ -48,6 +49,16 @@ class User < ApplicationRecord
   end
 
   private def default_values
+    role = Role.find_by(:name => 'normal')
+    if self.role.nil?
+      self.role = role
+    end
+
+    if self.org_role.nil?
+      self.org_role = role
+    end
+
+    self.org_id = 1
     self.validated = false
   end
 

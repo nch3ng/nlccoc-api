@@ -8,6 +8,15 @@
 Role.create([
   {
     name: 'normal'
+  },
+  {
+    name: 'admin'
+  },
+  {
+    name: 'manager'
+  },
+  {
+    name: 'accountant'
   }
 ])
 

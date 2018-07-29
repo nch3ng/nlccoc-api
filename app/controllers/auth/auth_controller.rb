@@ -46,8 +46,6 @@ class Auth::AuthController < ApplicationController
     @user.first_name = first_name
     @user.last_name = last_name
     @user.email = email
-    @user.role_id = 1
-    @user.org_id = 1
 
     @user.setPassword(pass)
 
