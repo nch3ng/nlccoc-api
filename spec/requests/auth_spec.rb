@@ -64,9 +64,16 @@ describe 'POST /api/auth/register' do
     expect(json['success']).to eq(false)
     expect(json['msg']).to eq('Password has to be at least 8 characters long')
   end
+end
+
+describe 'POST /api/auth/login' do
+
+  before(:all) do
+    post '/api/auth/register', :params => { email: 'jonhdoe@test.com', password: '12345678', first_name: 'John', last_name: 'Doe' }
+    expect(response).to be_successful
+  end
 
   it 'login an user with email, and password' do
-    post '/api/auth/register', :params => { email: 'jonhdoe@test.com', password: '12345678', first_name: 'John', last_name: 'Doe' }
     post '/api/auth/login', :params => { email: 'jonhdoe@test.com', password: '12345678' }
     expect(response).to be_successful
     json = JSON.parse(response.body)
@@ -76,8 +83,7 @@ describe 'POST /api/auth/register' do
   end
 
   it 'failed to login an user with email, and wrong password' do
-    post '/api/auth/register', :params => { email: 'jonhdoe@test.com', password: '12345678', first_name: 'John', last_name: 'Doe' }
-    expect(response).to be_successful
+    
     post '/api/auth/login', :params => { email: 'jonhdoe@test.com', password: '1234567' }
     expect(response).to be_successful
     json = JSON.parse(response.body)
@@ -85,29 +91,43 @@ describe 'POST /api/auth/register' do
     expect(json['msg']).to eq('The password is wrong')
   end
   it 'failed to login an user with an invalid email' do
-    post '/api/auth/login', :params => { email: 'jonhdoe@test.com', password: '12345678' }
+    post '/api/auth/login', :params => { email: 'jonhdoetest.com', password: '12345678' }
     expect(response).to be_successful
     json = JSON.parse(response.body)
     expect(json['success']).to eq(false)
     expect(json['msg']).to eq('This email is not registered')
   end
+end
+describe 'GET /api/auth/check-state' do
 
-  it 'state is valid if the token is valid' do
-    post '/api/auth/register', :params => { email: 'jonhdoe@test.com', password: '12345678', first_name: 'John', last_name: 'Doe' }
-    expect(response).to be_successful
+  before(:all) do
     post '/api/auth/login', :params => { email: 'jonhdoe@test.com', password: '12345678' }
     expect(response).to be_successful
     json = JSON.parse(response.body)
-    token = json['token']
-    
-    get '/api/auth/check-state', :headers => { "HTTP_X_ACCESS_TOKEN": token }
+    @token = json['token']
+  end
+
+  it 'state is valid if the token is valid passing x-access-token' do 
+    get '/api/auth/check-state', :headers => { "x-access-token": @token }
     expect(response).to be_successful
     json = JSON.parse(response.body)
-    puts json
     expect(json['success']).to eq(true)
     expect(json['msg']).to eq('You\'re authorized')
     decoded_token = json['decoded_token'].first
-    puts decoded_token
+    expect(decoded_token['email']).to eq('jonhdoe@test.com')
+    expect(decoded_token['name']).to eq('John Doe')
+
+    alg = json['decoded_token'].second['alg']
+    expect(alg).to eq('HS256')
+  end
+
+  it 'state is valid if the token is valid passing Bearer token' do 
+    get '/api/auth/check-state', :headers => { "Authorization": "Bearer #{@token}" }
+    expect(response).to be_successful
+    json = JSON.parse(response.body)
+    expect(json['success']).to eq(true)
+    expect(json['msg']).to eq('You\'re authorized')
+    decoded_token = json['decoded_token'].first
     expect(decoded_token['email']).to eq('jonhdoe@test.com')
     expect(decoded_token['name']).to eq('John Doe')
 

@@ -86,7 +86,7 @@ class Auth::AuthController < ApplicationController
   end
 
   def check_state
-    token = request.headers.env['HTTP_X_ACCESS_TOKEN']
+    token = Auth.token(request)
     msg = User.validateToken(token)
     msg['msg'] = 'You\'re authorized'
     render :json => msg
