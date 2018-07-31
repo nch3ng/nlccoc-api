@@ -1,4 +1,6 @@
-describe 'POST /api/auth/register' do
+require 'database_cleaner'
+
+RSpec.describe 'POST /api/auth/register' do
   it 'registers a user with first name, last name, email, and password' do
     post '/api/auth/register', :params => { email: 'jonhdoe@test.com', password: '12345678', first_name: 'John', last_name: 'Doe' }
     expect(response).to be_successful
@@ -7,7 +9,6 @@ describe 'POST /api/auth/register' do
     expect(json['msg']).to eq('You are successfully registered')
     expect(json['token']).to be_present
   end
-
   it 'failed to register a user with an exist email' do
     user = create(:user, email: 'jonhdoe1000@test.com')
     post '/api/auth/register', :params => { email: 'jonhdoe1000@test.com', password: '12345678', first_name: 'John', last_name: 'Doe' }
@@ -66,7 +67,7 @@ describe 'POST /api/auth/register' do
   end
 end
 
-describe 'POST /api/auth/login' do
+RSpec.describe 'POST /api/auth/login' do
 
   before(:all) do
     post '/api/auth/register', :params => { email: 'jonhdoe@test.com', password: '12345678', first_name: 'John', last_name: 'Doe' }
@@ -97,14 +98,28 @@ describe 'POST /api/auth/login' do
     expect(json['success']).to eq(false)
     expect(json['msg']).to eq('This email is not registered')
   end
+
+  after(:all) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
 end
-describe 'GET /api/auth/check-state' do
+RSpec.describe 'GET /api/auth/check-state' do
 
   before(:all) do
+    create(:role)
+    create(:organization)
+    post '/api/auth/register', :params => { email: 'jonhdoe@test.com', password: '12345678', first_name: 'John', last_name: 'Doe' }
+    expect(response).to be_successful
     post '/api/auth/login', :params => { email: 'jonhdoe@test.com', password: '12345678' }
     expect(response).to be_successful
     json = JSON.parse(response.body)
     @token = json['token']
+  end
+
+  after(:all) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
   end
 
   it 'state is valid if the token is valid passing x-access-token' do 

@@ -14,6 +14,8 @@ end
 
 describe 'Test /api/users with login' do
   before(:all) do
+    create(:role)
+    create(:organization)
     post '/api/auth/register', :params => { email: 'jonhdoe@test.com', password: '12345678', first_name: 'John', last_name: 'Doe' }
     expect(response).to be_successful
     post '/api/auth/login', :params => { email: 'jonhdoe@test.com', password: '12345678' }
@@ -22,6 +24,12 @@ describe 'Test /api/users with login' do
     expect(json['token']).to be_present
     @token = json['token']
   end
+
+  after(:all) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
   describe 'GET /api/users' do
     it 'should get the users list' do
       get '/api/users', :headers => { "HTTP_X_ACCESS_TOKEN": @token }
@@ -30,4 +38,6 @@ describe 'Test /api/users with login' do
       # puts json
     end
   end
+
+
 end
