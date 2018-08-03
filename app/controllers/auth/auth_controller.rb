@@ -88,7 +88,7 @@ class Auth::AuthController < ApplicationController
   def check_state
     token = Auth.token(request)
     msg = User.validateToken(token)
-    msg['msg'] = 'You\'re authorized'
+    # puts msg
     render :json => msg
   end
 

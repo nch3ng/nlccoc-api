@@ -21,20 +21,19 @@ class User < ApplicationRecord
   end
 
   def generateToken(exp)
-    payload = { exp: exp, id: self.id, email: self.email, name: "#{self.first_name} #{self.last_name}" }
+    payload = { 
+      exp: exp, 
+      id: self.id, 
+      email: self.email, 
+      name: "#{self.first_name} #{self.last_name}",
+      role: self.role.name,
+      org_role: self.org_role.name }
     token = Auth.issue(payload)
     return token
   end
 
   def self.validateToken(token)
-    begin
-      decoded_token = Auth.decode(token)
-      return { success: true, decoded_token: decoded_token}
-    rescue JWT::ExpiredSignature
-      return { success: false, msg: 'Token has been expired' }
-    rescue JWT::DecodeError
-      return { success: false, msg: 'Not enough or too many segments' }
-    end
+    Auth.decode(token)
   end
 
   private def default_values

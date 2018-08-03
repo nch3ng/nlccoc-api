@@ -6,7 +6,15 @@ class Auth
     JWT.encode payload, auth_secret, ALGORITHM
   end
   def self.decode(token)
-    JWT.decode token,  auth_secret, true, { algorithm: ALGORITHM }
+    begin
+      decoded_token = (JWT.decode token, auth_secret, true, { algorithm: ALGORITHM }).first
+      return { success: true, decoded_token: decoded_token, msg: 'You\'re authorized'}
+    rescue JWT::ExpiredSignature
+      return { success: false, msg: 'Token has been expired' }
+    rescue JWT::DecodeError
+      return { success: false, msg: 'Not enough or too many segments' }
+    end
+    # JWT.decode token, auth_secret, true, { algorithm: ALGORITHM }
   end
   def self.auth_secret
     ENV["AUTH_SECRET"]

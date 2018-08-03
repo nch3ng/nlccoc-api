@@ -35,7 +35,7 @@ describe 'Test /api/users with login' do
       get '/api/users', :headers => { "HTTP_X_ACCESS_TOKEN": @token }
       expect(response).to be_successful
       json = JSON.parse(response.body)
-      # puts json
+      puts json
     end
   end
 
