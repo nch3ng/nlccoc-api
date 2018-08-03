@@ -5,13 +5,10 @@ class ApplicationController < ActionController::API
   end
 
   def current_user
-    puts 'current_user'
     if auth_present?
       if auth[:success]
-
         decoded_token = auth[:decoded_token]
-        puts decoded_token
-        user = User.where(:email => decoded_token["email"]).select(User.attribute_names - ['salt', 'hash_key'])
+        user = User.where(:email => decoded_token["email"]).select(User.attribute_names - ['salt', 'hash_key']).first
         if user
           @current_user ||= user
         end

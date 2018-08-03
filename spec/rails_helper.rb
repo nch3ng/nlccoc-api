@@ -7,6 +7,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'rspec/rails'
 require 'support/factory_bot'
 require 'support/database_cleaner'
+require 'support/request_helpers'
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -73,4 +74,6 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  config.include Request::JSONHelpers, type: :request
 end
