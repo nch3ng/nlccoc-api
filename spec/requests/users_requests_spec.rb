@@ -23,8 +23,9 @@ describe 'Test /api/users with login' do
     for role in [:normal, :admin, :manager, :accountant, :employee ] do
       create(:role, role)
     end
-    create(:organization)
+    create_list(:organization, 10)
     create_list(:user, 10)
+    create_list(:department, 10)
 
     
     
@@ -70,6 +71,43 @@ describe 'Test /api/users with login' do
       expect(response).to be_successful
       json = JSON.parse(response.body)
       expect(json).not_to be_present
+    end
+  end
+
+  describe 'PUT /api/users/:id' do
+    it 'should update the user info' do
+      user = { first_name: 'Nate', last_name: 'Pig', org_role_id: 2, department_id: 1}
+      put '/api/users/1', :headers => { "HTTP_X_ACCESS_TOKEN": @token }, :params => { :user => user}
+      expect(response).to be_successful
+      json = JSON.parse(response.body)
+      expect(json['success']).to eq(true)
+      get '/api/users/1', :headers => { "HTTP_X_ACCESS_TOKEN": @token }
+      expect(response).to be_successful
+      # puts json_res
+      expect(json_res[:first_name]).to eq('Nate')
+      expect(json_res[:last_name]).to eq('Pig')
+      expect(json_res[:org_role_id]).to eq(2)
+    end
+  end
+
+  describe 'POST /api/users' do
+    it 'should create a user and send validation email' do
+      user = { first_name: 'Jane', last_name: 'Doe', org_role_id: 2, department_id: 1, hired_at: Date.today}
+      email = 'boo.test@test.com'
+      post '/api/users', :headers => { "HTTP_X_ACCESS_TOKEN": @token }, :params => { :user => user, email: email}
+      expect(response).to be_successful
+      id = json_res[:user][:id]
+      get '/api/users/' + id.to_s, :headers => { "HTTP_X_ACCESS_TOKEN": @token }
+      expect(response).to be_successful
+      # puts json_res[:user]
+      expect(json_res[:success]).to eq(true)
+      # puts json_res[:user]
+      expect(json_res[:user][:first_name]).to eq('Jane')
+      expect(json_res[:user][:last_name]).to eq('Doe')
+      expect(json_res[:user][:email]).to eq('boo.test@test.com')
+      expect(json_res[:user][:org_role][:id]).to eq(2)
+      expect(json_res[:user][:department][:id]).to eq(1)
+      expect(json_res[:user][:hired_at]).to eq(Date.today.strftime("%Y-%m-%d"))
     end
   end
 

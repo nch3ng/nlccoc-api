@@ -26,3 +26,10 @@ Organization.create([
     address: '1518 Brookhollow Dr., Santa Ana, CA 92705'
   }
 ])
+
+Department.create(
+  [
+    name: 'Department 1',
+    organization_id: 1
+  ]
+)

@@ -24,14 +24,15 @@ FactoryBot.define do
   end
 
   factory :organization, aliases: [:org] do
-    name "Test Org Name"
-    address "17 Ninos, Pomona, CA 91234"
+    sequence(:name) {|n| "Organization #{n} name" }
+    sequence(:address) {|n| "Organization #{n} address" }
   end
 
   factory :user do
     sequence(:email) {|n| "johndoe#{n}@test.com" }
     first_name "John"
     last_name "Doe"
+    department_id  nil
     role_id 1
     org_id 1
   end

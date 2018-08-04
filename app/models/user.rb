@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  belongs_to :department, class_name: 'Department', optional: true
   belongs_to :role
   belongs_to :org_role, class_name: 'Role'
   belongs_to :org, class_name: 'Organization'

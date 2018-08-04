@@ -10,10 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_29_051227) do
+ActiveRecord::Schema.define(version: 2018_08_04_074214) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "department_to_users", force: :cascade do |t|
+  end
+
+  create_table "departments", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "organization_id"
+    t.index ["organization_id"], name: "index_departments_on_organization_id"
+  end
+
+  create_table "org_depts", force: :cascade do |t|
+    t.integer "department_id"
+    t.integer "organization_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "organizations", force: :cascade do |t|
     t.string "name"
@@ -40,10 +58,13 @@ ActiveRecord::Schema.define(version: 2018_07_29_051227) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "org_role_id"
+    t.date "hired_at"
+    t.integer "department_id"
     t.index ["org_id"], name: "index_users_on_org_id"
     t.index ["role_id"], name: "index_users_on_role_id"
   end
 
+  add_foreign_key "departments", "organizations"
   add_foreign_key "users", "organizations", column: "org_id"
   add_foreign_key "users", "roles"
 end
