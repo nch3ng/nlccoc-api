@@ -16,6 +16,27 @@ describe 'Test /api/users without login' do
       expect(json['msg']).to eq('unauthorized')
     end
   end
+
+  describe 'PUT /api/users/:id' do
+    it 'should not update the user info' do
+      user = { first_name: 'Nate', last_name: 'Pig', org_role_id: 2, department_id: 1}
+      put '/api/users/1', :params => { :user => user}
+      expect(response).to have_http_status(401)
+      expect(json_res[:success]).to eq(false)
+      expect(json_res[:msg]).to eq('unauthorized')
+    end
+  end
+
+  describe 'POST /api/users' do
+    it 'should create a user and send validation email' do
+      user = { first_name: 'Jane', last_name: 'Doe', org_role_id: 2, department_id: 1, hired_at: Date.today}
+      email = 'boo.test@test.com'
+      post '/api/users', :params => { :user => user, email: email}
+      expect(response).to have_http_status(401)
+      expect(json_res[:success]).to eq(false)
+      expect(json_res[:msg]).to eq('unauthorized')
+    end
+  end
 end
 
 describe 'Test /api/users with login' do
@@ -99,9 +120,7 @@ describe 'Test /api/users with login' do
       id = json_res[:user][:id]
       get '/api/users/' + id.to_s, :headers => { "HTTP_X_ACCESS_TOKEN": @token }
       expect(response).to be_successful
-      # puts json_res[:user]
       expect(json_res[:success]).to eq(true)
-      # puts json_res[:user]
       expect(json_res[:user][:first_name]).to eq('Jane')
       expect(json_res[:user][:last_name]).to eq('Doe')
       expect(json_res[:user][:email]).to eq('boo.test@test.com')
