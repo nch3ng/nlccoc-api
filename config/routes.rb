@@ -11,5 +11,6 @@ Rails.application.routes.draw do
 
     resources :users
     resources :departments
+    resources :organizations
   end
 end

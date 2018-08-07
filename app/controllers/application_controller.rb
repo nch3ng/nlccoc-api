@@ -17,21 +17,25 @@ class ApplicationController < ActionController::API
   end
 
   def authenticate(role = nil)
-    logger.debug(role)
     if role.nil? 
       render json: { success: false, msg: "unauthorized"}, status: 401 unless logged_in?
     else
       if auth_present? 
         roles = role.split(':')
+        decoded_token = auth[:decoded_token]
         if roles[0] == 'org'
-          if auth['success']
-            decoded_token = auth['decoded_token']
-            # puts decoded_token
-            if decoded_token['org_role'] != role
-              render json: { success: false, msg: "unauthorized"}, status: 401 unless logged_in?
+          # role is at role[1]
+          if auth[:success]
+            if decoded_token['org_role'] != roles[1]
+              render json: { success: false, msg: "unauthorized"}, status: 401 
             end
           else
-            render json: { success: false, msg: "unauthorized"}, status: 401 unless logged_in?
+            render json: { success: false, msg: "unauthorized"}, status: 401
+          end
+        else
+          # roles[0] is a role
+          if decoded_token['role'] != roles[0]
+            render json: { success: false, msg: "unauthorized"}, status: 401
           end
         end
       else

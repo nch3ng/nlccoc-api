@@ -25,6 +25,9 @@ class Auth::AuthController < ApplicationController
     if last_name.nil? 
       return render :json => { 'success': false, 'msg': 'Last name is needed' }
     end
+
+    org_role_id = params['org_role_id']
+
     # All needed params
     pass = params['password']
     if pass.nil? 
@@ -39,6 +42,7 @@ class Auth::AuthController < ApplicationController
     @user.first_name = first_name
     @user.last_name = last_name
     @user.email = email
+    @user.org_role_id = org_role_id unless org_role_id.nil?
 
     @user.setPassword(pass)
 
