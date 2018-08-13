@@ -7,7 +7,7 @@ class User < ApplicationRecord
   validates :email, uniqueness: true, presence: true
   before_validation :default_values
 
-  def setPassword(password)
+  def setThePassword(password)
     self.salt = Auth.salt
     self.hash_key = self.generateHash(password, self.salt)
   end
@@ -45,6 +45,10 @@ class User < ApplicationRecord
 
     if self.org_role.nil?
       self.org_role = role
+    end
+
+    if self.setPassword.nil?
+      self.setPassword = false
     end
 
     self.org_id = 1

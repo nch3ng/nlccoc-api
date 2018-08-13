@@ -11,10 +11,12 @@ class UsersController < ApplicationController
   def create
     # puts user_params
     # puts params[:email]
-    @user = User.new(user_params.merge(email: params[:email], org_id: current_user.org_id, department_id: 1))
-    @user.department_id = 1
+    @user = User.new(user_params.merge(org_id: current_user.org_id, department_id: 1))
     if @user.save
-      render :json => { :success => true, :user => @user.as_json(:include => [:org_role, :org, :department]) }
+      @token = Token.new(userId: @user.id, token: Auth.salt)
+      if @token.save
+        render :json => { :success => true, :user => @user.as_json(:include => [:org_role, :org, :department]) }
+      end
     else
       render :json => { :success => false }
     end
@@ -45,6 +47,6 @@ class UsersController < ApplicationController
 
   private
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :org_role_id, :hired_at, :department_id)
+      params.require(:user).permit(:email, :first_name, :last_name, :org_role_id, :hired_at, :department_id)
     end
 end

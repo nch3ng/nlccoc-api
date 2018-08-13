@@ -44,7 +44,8 @@ class Auth::AuthController < ApplicationController
     @user.email = email
     @user.org_role_id = org_role_id unless org_role_id.nil?
 
-    @user.setPassword(pass)
+    @user.setThePassword(pass)
+    @user.setPassword = true
 
     if @user.save
       exp = Time.now.to_i + 4 * 3600
@@ -62,7 +63,6 @@ class Auth::AuthController < ApplicationController
   end
 
   def login
-    logger.debug params 
     email = params['email']
     password = params['password']
 
@@ -80,11 +80,13 @@ class Auth::AuthController < ApplicationController
     end
     exp = Time.now.to_i + 4 * 3600
     token = @user.generateToken(exp)
-
+    @user.salt = nil
+    @user.hash_key = nil
     render :json => { 
       'success': true,
       'msg': 'You are successfully logged in',
-      token: token
+      token: token,
+      user: @user.as_json( except: [:salt, :hash_key])
     }
 
   end

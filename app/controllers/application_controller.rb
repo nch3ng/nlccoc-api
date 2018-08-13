@@ -17,6 +17,7 @@ class ApplicationController < ActionController::API
   end
 
   def authenticate(role = nil)
+
     if role.nil? 
       render json: { success: false, msg: "unauthorized"}, status: 401 unless logged_in?
     else
@@ -26,6 +27,7 @@ class ApplicationController < ActionController::API
         if roles[0] == 'org'
           # role is at role[1]
           if auth[:success]
+
             if decoded_token['org_role'] != roles[1]
               render json: { success: false, msg: "unauthorized"}, status: 401 
             end
